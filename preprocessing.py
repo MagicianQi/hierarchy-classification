@@ -65,7 +65,7 @@ class BertVec:
         return tokens, embeddings
 
     @staticmethod
-    def cut_text(text, slice_len):
+    def cut_text(text: str, slice_len: int) -> List:
         text_list = re.findall('.{' + str(slice_len) + '}', text)
         text_list.append(text[(len(text_list) * slice_len):])
         return text_list

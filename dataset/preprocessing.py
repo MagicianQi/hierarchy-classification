@@ -27,7 +27,7 @@ def cut_sentence(sentence: str) -> List:
     """
     Sentence segmentation.
     """
-    return [x for x in jieba.cut("".join(sentence), cut_all=False)]
+    return [x for x in jieba.cut(sentence, cut_all=False)]
 
 
 class BertVec(object):
@@ -48,7 +48,9 @@ class BertVec(object):
             tokens: List of characters
             encodings: List of encodings
         """
-        text = text.strip().replace(" ", "").replace("　", "")
+        text_list = [s.strip() for s in text]
+        text_list.remove('')
+        text = "".join(text_list)
         if len(text) > (self.max_seq_len - 2):
             result = [[t, e] for t, e in map(self._per, self.cut_text(text, self.max_seq_len - 2))]
             tokens = []
@@ -97,4 +99,4 @@ class BertVec(object):
 if __name__ == "__main__":
     bv = BertVec()
     bv_tokens, bv_embeddings = bv.encode("美邦服饰数据显示。")
-    print(len(bv_tokens))
+    print(cut_sentence("".join(bv_tokens)))

@@ -32,7 +32,13 @@ confidential
         * Modify variables 'NUM_WORKER' and 'PATH_MODEL' in start_bert_service.sh
         * `bash start_bert_service.sh`
     2. background task
-        * `bert-serving-start -num_worker 1 -model_dir ./ckpts/chinese_L-12_H-768_A-12 -show_tokens_to_client -pooling_strategy NONE -max_seq_len 512 &`
+        * `bert-serving-start -num_worker=1 -model_dir ./ckpts/chinese_L-12_H-768_A-12 -show_tokens_to_client -pooling_strategy NONE -max_seq_len 512 &`
 * Train and Test:
     * Modify global parameters in baseline.py
     * `python baseline.py`
+    
+## others
+
+1.kill background task
+
+`ps -ef | grep bert-serving-start | awk '{ print $2 }' | sudo xargs kill -9`

@@ -28,7 +28,7 @@ confidential
 * Environment : 
     * `pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple`
 * Start bert service (two ways): 
-    1. docker
+    1. docker(推荐)
         * Modify variables 'NUM_WORKER' and 'PATH_MODEL' in start_bert_service.sh
         * `bash start_bert_service.sh`
     2. background task

@@ -131,8 +131,5 @@ dmypy.json
 # ckpts
 models/
 
-# data
-sample_data/ 
-
 # work dir
 workdir/

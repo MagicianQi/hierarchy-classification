@@ -13,22 +13,28 @@ from utils.common import Logger
 # --------------------global parameters-------------------
 
 work_dir = "./workdir/baseline/"
+train_data_path = "./sample_data/news.train"
+val_data_path = "./sample_data/news.dev"
+test_data_path = "./sample_data/news.test"
+
 bv = BertVec()
-num_epochs = 100
+num_epochs = 1
 text_length = 512
 vec_length = 768
 num_classes = 2
+labels = ["股票", "体育"]
+lr_init = 0.01
+GPU_id = "cuda:0"
+
 
 os.makedirs(work_dir, exist_ok=True)
-device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
+device = torch.device(GPU_id if torch.cuda.is_available() else "cpu")
 logger = Logger(file_path="{}log.log".format(work_dir))
 
 # --------------------data pipeline-------------------
 
-labels = ["股票", "体育"]
-
-datasets_train = BaselineDataSet("./sample_data/news.train", labels, bv, text_length, vec_length)
-datasets_val = BaselineDataSet("./sample_data/news.dev", labels, bv, text_length, vec_length)
+datasets_train = BaselineDataSet(train_data_path, labels, bv, text_length, vec_length)
+datasets_val = BaselineDataSet(val_data_path, labels, bv, text_length, vec_length)
 
 # num_workers不为0的话会死锁(待解决)
 dataLoader_train = torch.utils.data.DataLoader(datasets_train,
@@ -50,8 +56,8 @@ model.train(mode=True)
 # --------------------loss function and optimizer-------------------
 
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, betas=(0.9, 0.99))
-exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
+optimizer = torch.optim.Adam(model.parameters(), lr=lr_init, betas=(0.9, 0.99))
+exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
 
 # --------------------params-------------------
 
@@ -68,24 +74,29 @@ params = {
 
 # --------------------train and val-------------------
 
-# best_model_wts = copy.deepcopy(model.state_dict())
-# best_acc = 0.0
-#
-# for epoch in range(num_epochs):
-#     train_process(dataLoader_train, epoch, params)
-#     val_acc = val_process(dataLoader_val, epoch, params)
-#     exp_lr_scheduler.step()
-#     if val_acc > best_acc:
-#         best_acc = val_acc
-#         best_model_wts = copy.deepcopy(model.state_dict())
-#     torch.save(model.state_dict(), "{}epoch-{}.pkl".format(work_dir, epoch))
-#
-# model.load_state_dict(best_model_wts)
-# torch.save(model.state_dict(), "{}best-val.pkl".format(work_dir))
+best_model_wts = copy.deepcopy(model.state_dict())
+best_acc = 0.0
+
+print("Start training:")
+print("Detailed training log path: {}".format("{}log.log".format(work_dir)))
+
+for epoch in range(num_epochs):
+    epoch_index = "{}/{}".format(epoch + 1, num_epochs)
+    train_process(dataLoader_train, epoch_index, params)
+    val_acc = val_process(dataLoader_val, epoch_index, params)
+    exp_lr_scheduler.step()
+    if val_acc > best_acc:
+        best_acc = val_acc
+        best_model_wts = copy.deepcopy(model.state_dict())
+    torch.save(model.state_dict(), "{}epoch-{}.pkl".format(work_dir, epoch))
+
+model.load_state_dict(best_model_wts)
+torch.save(model.state_dict(), "{}best-val.pkl".format(work_dir))
 
 # --------------------inference-------------------
 
-model.load_state_dict(torch.load("{}epoch-0.pkl".format(work_dir), map_location=lambda storage, loc: storage))
+model.load_state_dict(torch.load("{}best-val.pkl".format(work_dir), map_location=lambda storage, loc: storage))
 model.eval()
 
-predict("./sample_data/news.test", work_dir, params)
+print("Start testing:")
+predict(test_data_path, work_dir, params)

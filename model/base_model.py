@@ -9,7 +9,7 @@ from model.self_attention import SelfAttention
 
 class BaseModel(nn.Module):
     """
-    Self Attention for the last dimension
+    Base Line model
     """
 
     def __init__(self, input_size, num_classes):

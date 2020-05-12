@@ -14,6 +14,7 @@ class BaselineDataSet(data.Dataset):
         data_combined = []
         for line in fh.readlines():
             split_data = line.strip().split("\t")
+            # Invalid format
             if len(split_data) != 2:
                 continue
             label, text = split_data

@@ -3,10 +3,12 @@
 from typing import List
 
 import re
-
 import jieba
 
-jieba.load_userdict('./static/jieba_custom_word_dict.txt')
+from settings import JIEBA_CUSTOM_WORD_DICT_PATH
+
+# Bert 有很多字是多个字符，把这些作为一个词处理
+jieba.load_userdict(JIEBA_CUSTOM_WORD_DICT_PATH)
 
 
 def cut_paragraph(para: str) -> List:
@@ -28,12 +30,25 @@ def cut_sentence(sentence: str) -> List:
     """
     Sentence segmentation.
     """
-    return [x for x in jieba.cut(sentence, cut_all=False)]
+    return bert_UNK_process([x for x in jieba.cut(sentence, cut_all=False)])
 
 
-# def load_jieba_custom_words():
-#     words = []
-#     with open('./static/jieba_custom_word_dict.txt', "r") as f:
-#         for line in f.readlines():
-#             words.append(line.strip())
-#     return words
+def bert_UNK_process(cuts):
+    """
+    jieba分词的时候对于带标点的词没法区分，这个把[UNK]转换为一个词。
+    '[', 'UNK', ']'   -> '[UNK]'
+    """
+    result = []
+    for i in range(len(cuts)):
+        if 2 <= i < len(cuts) - 2:
+            if (cuts[i] == '[') and (cuts[i + 1] in ['UNK', 'PAD', 'CLS', 'SEP', 'MASK']) and (cuts[i + 2] == ']'):
+                result.append("{}{}{}".format(cuts[i], cuts[i + 1], cuts[i + 2]))
+            elif (cuts[i - 1] == '[') and (cuts[i] in ['UNK', 'PAD', 'CLS', 'SEP', 'MASK']) and (cuts[i + 1] == ']'):
+                pass
+            elif (cuts[i - 2] == '[') and (cuts[i - 1] in ['UNK', 'PAD', 'CLS', 'SEP', 'MASK']) and (cuts[i] == ']'):
+                pass
+            else:
+                result.append(cuts[i])
+        else:
+            result.append(cuts[i])
+    return result

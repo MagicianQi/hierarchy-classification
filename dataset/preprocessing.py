@@ -62,7 +62,10 @@ class BertVec(object):
         return tokens, embeddings
 
     @staticmethod
-    def text_process(text):
+    def text_process(text: str) -> str:
+        """
+        Text specification, remove blank space etc.
+        """
         result = ""
         text_list = [s.strip() for s in text]
         for each in text_list:
@@ -83,6 +86,4 @@ class BertVec(object):
 
 
 if __name__ == "__main__":
-    bv = BertVec()
-    bv_tokens, bv_embeddings = bv.encode("美邦服饰数据显示。")
-    print(cut_sentence("".join(bv_tokens)))
+    pass

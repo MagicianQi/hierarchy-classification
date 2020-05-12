@@ -2,3 +2,4 @@ bert-serving-client==1.10.0
 bert-serving-server==1.10.0
 jieba==0.42.1
 torch==1.2.0
+tqdm==4.32.1

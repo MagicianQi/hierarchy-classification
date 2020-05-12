@@ -5,10 +5,10 @@ import torch.utils.data as data
 
 
 class BaselineDataSet(data.Dataset):
-    def __init__(self, data_path, class_names, bert_vec, seq_length, vec_length):
+    def __init__(self, data_path, class_names, bert_vec, text_length, vec_length):
         fh = open(data_path, "r")
         self.classes = class_names
-        self.seq_length = seq_length
+        self.text_length = text_length
         self.vec_length = vec_length
         self.bv = bert_vec
         data_combined = []
@@ -24,12 +24,12 @@ class BaselineDataSet(data.Dataset):
     def __getitem__(self, index):
         text, label_id = self.data_combined[index]
         _, encodings = self.bv.encode(text)
-        if len(encodings) >= self.seq_length:
+        if len(encodings) >= self.text_length:
             # truncation
-            encodings = encodings[0:self.seq_length]
+            encodings = encodings[0:self.text_length]
         else:
             # padding
-            encodings.extend([[0.0 for _ in range(self.vec_length)] for _ in range(self.seq_length - len(encodings))])
+            encodings.extend([[0.0 for _ in range(self.vec_length)] for _ in range(self.text_length - len(encodings))])
         return torch.Tensor(encodings), label_id
 
     def __len__(self):

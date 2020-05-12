@@ -4,30 +4,7 @@ from typing import List
 
 import re
 
-import jieba
 from bert_serving.client import BertClient
-
-
-def cut_paragraph(para: str) -> List:
-    """
-    Paragraph segmentation.
-    Code is from: https://blog.csdn.net/blmoistawinde/article/details/82379256
-    """
-    para = re.sub('([。！？\?])([^”’])', r"\1\n\2", para)  # 单字符断句符
-    para = re.sub('(\.{6})([^”’])', r"\1\n\2", para)  # 英文省略号
-    para = re.sub('(\…{2})([^”’])', r"\1\n\2", para)  # 中文省略号
-    para = re.sub('([。！？\?][”’])([^，。！？\?])', r'\1\n\2', para)
-    # 如果双引号前有终止符，那么双引号才是句子的终点，把分句符\n放到双引号后，注意前面的几句都小心保留了双引号
-    para = para.rstrip()  # 段尾如果有多余的\n就去掉它
-    # 很多规则中会考虑分号;，但是这里我把它忽略不计，破折号、英文双引号等同样忽略，需要的再做些简单调整即可。
-    return para.split("\n")
-
-
-def cut_sentence(sentence: str) -> List:
-    """
-    Sentence segmentation.
-    """
-    return [x for x in jieba.cut(sentence, cut_all=False)]
 
 
 class BertVec(object):
@@ -48,9 +25,7 @@ class BertVec(object):
             tokens: List of characters
             encodings: List of encodings
         """
-        text_list = [s.strip() for s in text]
-        text_list.remove('')
-        text = "".join(text_list)
+        text = self.text_process(text)
         if len(text) > (self.max_seq_len - 2):
             result = [[t, e] for t, e in map(self._per, self.cut_text(text, self.max_seq_len - 2))]
             tokens = []
@@ -87,12 +62,23 @@ class BertVec(object):
         return tokens, embeddings
 
     @staticmethod
+    def text_process(text):
+        result = ""
+        text_list = [s.strip() for s in text]
+        for each in text_list:
+            if each != "":
+                result += each
+        return result
+
+    @staticmethod
     def cut_text(text: str, slice_len: int) -> List:
         """
         Cut string by fixed length
         """
         text_list = re.findall('.{' + str(slice_len) + '}', text)
         text_list.append(text[(len(text_list) * slice_len):])
+        if text_list[-1] == "":
+            return text_list[:-1]
         return text_list
 
 

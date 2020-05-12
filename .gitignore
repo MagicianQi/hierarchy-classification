@@ -133,3 +133,6 @@ models/
 
 # data
 sample_data/ 
+
+# work dir
+workdir/

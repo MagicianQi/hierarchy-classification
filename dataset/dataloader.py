@@ -24,6 +24,8 @@ class BaselineDataSet(data.Dataset):
 
     def __getitem__(self, index):
         text, label_id = self.data_combined[index]
+        # 此处造成死锁 原因为getitem函数引用了第三方库
+        # 若把这个函数放到init中，内存估计不足。
         _, encodings = self.bv.encode(text)
         if len(encodings) >= self.text_length:
             # truncation

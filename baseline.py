@@ -36,7 +36,7 @@ logger = Logger(file_path="{}log.log".format(work_dir))
 datasets_train = BaselineDataSet(train_data_path, labels, bv, text_length, vec_length)
 datasets_val = BaselineDataSet(val_data_path, labels, bv, text_length, vec_length)
 
-# num_workers不为0的话会死锁(待解决)
+# num_workers不为0的话会死锁(原因见BaselineDataSet)
 dataLoader_train = torch.utils.data.DataLoader(datasets_train,
                                                batch_size=32,
                                                shuffle=True,

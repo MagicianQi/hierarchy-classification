@@ -81,8 +81,6 @@ def val_process(dataLoader, epoch, params):
 
 def predict(data_path, work_dir, params):
     model = params['model']
-    text_length = params['text_length']
-    vec_length = params['vec_length']
     bv = params['bv']
     device = params['device']
     result_dir = work_dir + "predict_result/"
@@ -103,13 +101,7 @@ def predict(data_path, work_dir, params):
         data_list.set_description("process text {}".format(i + 1))
         with open("{}{}.txt".format(result_dir, i), "w") as f:
             f.write("original:\n{}\n".format(text))
-            # -------提取特征向量，截断和补齐-------
             tokens, encodings = bv.encode(text)
-            if len(encodings) >= text_length:
-                tokens = tokens[0:text_length]
-                encodings = encodings[0:text_length]
-            else:
-                encodings.extend([[0.0 for _ in range(vec_length)] for _ in range(text_length - len(encodings))])
 
             # -------模型前向，取每个字的权重-------
             f.write("trained:\n{}\n".format("".join(tokens)))

@@ -19,7 +19,7 @@ test_data_path = "./sample_data/news.test"
 
 bv = BertVec()
 num_epochs = 1
-text_length = 512
+max_text_length = 512  # 主要为了Batch训练
 vec_length = 768
 num_classes = 2
 labels = ["股票", "体育"]
@@ -33,8 +33,8 @@ logger = Logger(file_path="{}log.log".format(work_dir))
 
 # --------------------data pipeline-------------------
 
-datasets_train = BaselineDataSet(train_data_path, labels, bv, text_length, vec_length)
-datasets_val = BaselineDataSet(val_data_path, labels, bv, text_length, vec_length)
+datasets_train = BaselineDataSet(train_data_path, labels, bv, max_text_length, vec_length)
+datasets_val = BaselineDataSet(val_data_path, labels, bv, max_text_length, vec_length)
 
 # num_workers不为0的话会死锁(原因见BaselineDataSet)
 dataLoader_train = torch.utils.data.DataLoader(datasets_train,
@@ -67,7 +67,7 @@ params = {
     "criterion": criterion,
     "device": device,
     "bv": bv,
-    "text_length": text_length,
+    "max_text_length": max_text_length,
     "vec_length": vec_length,
     "logger": logger
 }

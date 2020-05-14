@@ -4,6 +4,8 @@ import time
 import logging
 import datetime
 
+import torch
+
 
 class Logger(object):
 
@@ -32,4 +34,3 @@ class Logger(object):
             self.logger.info("{} | {}".format(date_str, line))
         else:
             self.logger.info("{}".format(line))
-

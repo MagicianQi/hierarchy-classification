@@ -13,9 +13,9 @@ class BertVec(object):
         Model is from: https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip
     """
 
-    def __init__(self):
+    def __init__(self, max_seq_len=512):
         self.bc = BertClient()
-        self.max_seq_len = 512
+        self.max_seq_len = max_seq_len
 
     def encode(self, text: str) -> (List, List):
         """

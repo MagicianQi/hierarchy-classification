@@ -38,17 +38,18 @@ def bert_UNK_process(cuts):
     jieba分词的时候对于带标点的词没法区分，这个把[UNK]转换为一个词。
     '[', 'UNK', ']'   -> '[UNK]'
     """
+    slices = [slice(x, x+3) for x in range(len(cuts) - 2)]
+    i = 0
     result = []
-    for i in range(len(cuts)):
-        if 2 <= i < len(cuts) - 2:
-            if (cuts[i] == '[') and (cuts[i + 1] in ['UNK', 'PAD', 'CLS', 'SEP', 'MASK']) and (cuts[i + 2] == ']'):
-                result.append("{}{}{}".format(cuts[i], cuts[i + 1], cuts[i + 2]))
-            elif (cuts[i - 1] == '[') and (cuts[i] in ['UNK', 'PAD', 'CLS', 'SEP', 'MASK']) and (cuts[i + 1] == ']'):
-                pass
-            elif (cuts[i - 2] == '[') and (cuts[i - 1] in ['UNK', 'PAD', 'CLS', 'SEP', 'MASK']) and (cuts[i] == ']'):
-                pass
-            else:
-                result.append(cuts[i])
+    while i < len(slices):
+        citrin = "".join(cuts[slices[i]])
+        if citrin in ['[UNK]', '[PAD]', '[CLS]', '[SEP]', '[MASK]']:
+            result.append(citrin)
+            i += 3
         else:
             result.append(cuts[i])
+            i += 1
+            if i == len(slices):
+                result.append(cuts[i])
+                result.append(cuts[i + 1])
     return result

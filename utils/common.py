@@ -4,8 +4,6 @@ import time
 import logging
 import datetime
 
-import torch
-
 
 class Logger(object):
 

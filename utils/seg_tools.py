@@ -30,10 +30,13 @@ def cut_sentence(sentence: str) -> List:
     """
     Sentence segmentation.
     """
-    return bert_UNK_process([x for x in jieba.cut(sentence, cut_all=False)])
+    seg = [x for x in jieba.cut(sentence, cut_all=False)]
+    seg = bert_mask_process(seg)
+    seg = bert_special_char_process(seg)
+    return seg
 
 
-def bert_UNK_process(cuts):
+def bert_mask_process(cuts):
     """
     jieba分词的时候对于带标点的词没法区分，这个把[UNK]转换为一个词。
     '[', 'UNK', ']'   -> '[UNK]'
@@ -49,7 +52,30 @@ def bert_UNK_process(cuts):
         else:
             result.append(cuts[i])
             i += 1
-            if i == len(slices):
-                result.append(cuts[i])
-                result.append(cuts[i + 1])
+    # 处理最后剩余的元素
+    while i < len(cuts):
+        result.append(cuts[i])
+        i += 1
+    return result
+
+
+def bert_special_char_process(cuts):
+    """
+    jieba分词的时候对于 "##f" 等会分为 "##" 和 "f"。
+    '##', 'f' -> '##f'
+    """
+    slices = [slice(x, x+2) for x in range(len(cuts) - 1)]
+    i = 0
+    result = []
+    while i < len(slices):
+        citrin = cuts[slices[i]]
+        if citrin[0] == "##" and len(citrin[1]) == 1:
+            result.append("".join(citrin))
+            i += 2
+        else:
+            result.append(cuts[i])
+            i += 1
+    while i < len(cuts):
+        result.append(cuts[i])
+        i += 1
     return result

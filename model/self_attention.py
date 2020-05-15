@@ -20,7 +20,7 @@ class SelfAttention(nn.Module):
 
     def forward(self, x):
         weights = self.weight_layer(x)
-        weights = torch.squeeze(weights, 2)
+        weights = torch.squeeze(weights, -1)
         attention_score = F.softmax(weights, dim=-1)
         out = torch.unsqueeze(attention_score, -1) * x
         return out, attention_score

@@ -9,7 +9,7 @@ sudo docker build -t bert-as-service -f ./docker/Dockerfile .
 
 # bert-server-docker container
 sudo docker run \
---runtime nvidia \
+--gpus all \
 --name bert-server-docker \
 --restart always \
 -e CUDA_VISIBLE_DEVICES=0 \

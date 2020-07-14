@@ -46,3 +46,12 @@ confidential
 1.kill background task
 
 `ps -ef | grep bert-serving-start | awk '{ print $2 }' | sudo xargs kill -9`
+
+2.docker 安装
+
+* 阿里源：https://blog.csdn.net/a632189007/article/details/78662741
+* 清华源：https://www.cnblogs.com/lemanlai/p/13171706.html
+
+3.nvidia-docker 安装
+
+https://github.com/NVIDIA/nvidia-docker

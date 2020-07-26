@@ -119,14 +119,22 @@ def predict(data_path, work_dir, params):
             sentence_result = []
             word_result = []
             char_result = []
-
             for s, sentence_tokens in enumerate(hierarchy_tokens):
+                # 归一化
+                true_sentence_length = len(hierarchy_tokens)
+                para_attentions[0:true_sentence_length] = [x / sum(para_attentions[0:true_sentence_length]) for x in para_attentions[0:true_sentence_length]]
                 sentence_score = para_attentions[s]
                 sentence_result.append(["".join(["".join(x) for x in sentence_tokens]), sentence_score])
                 for w, word_tokens in enumerate(sentence_tokens):
+                    # 归一化
+                    true_word_length = len(sentence_tokens)
+                    sentence_attentions[s][0:true_word_length] = [x / sum(sentence_attentions[s][0:true_word_length]) for x in sentence_attentions[s][0:true_word_length]]
                     word_score = sentence_attentions[s][w]
                     word_result.append(["".join(word_tokens), sentence_score * word_score])
                     for c, char_token in enumerate(word_tokens):
+                        # 归一化
+                        true_char_length = len(word_tokens)
+                        word_attentions[s][w][0:true_char_length] = [x / sum(word_attentions[s][w][0:true_char_length]) for x in word_attentions[s][w][0:true_char_length]]
                         char_score = word_attentions[s][w][c]
                         char_result.append([char_token, sentence_score * word_score * char_score])
 
